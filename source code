@@ -1,0 +1,150 @@
+import tkinter as tk
+from tkinter import messagebox
+
+# -----------------
+# Colors & Fonts
+# -----------------
+NAVY_BLUE = '#000080'
+LIGHT_BLUE = '#1a1aff'   # hover effect color
+WHITE = 'white'
+LIGHT_GRAY = '#f0f0f0'
+BLACK = 'black'
+CASUAL_FONT = ("Comic Sans MS", 12)
+
+# -----------------
+# Functions
+# -----------------
+def add_task():
+    """Adds a task from the entry field to the listbox."""
+    task = task_entry.get()
+    if task:
+        task_listbox.insert(tk.END, task)
+        task_entry.delete(0, tk.END)
+    else:
+        messagebox.showwarning("Warning", "You must enter a task.")
+
+def delete_task():
+    """Deletes the selected task from the listbox."""
+    try:
+        selected_task_index = task_listbox.curselection()[0]
+        task_listbox.delete(selected_task_index)
+    except IndexError:
+        messagebox.showwarning("Warning", "You must select a task to delete.")
+
+def mark_complete():
+    """Marks the selected task as complete by adding a checkmark."""
+    try:
+        selected_task_index = task_listbox.curselection()[0]
+        current_task = task_listbox.get(selected_task_index)
+        if "✔" not in current_task:
+            task_listbox.delete(selected_task_index)
+            task_listbox.insert(selected_task_index, f"{current_task} ✔")
+        else:
+            messagebox.showinfo("Info", "This task is already marked as complete.")
+    except IndexError:
+        messagebox.showwarning("Warning", "You must select a task to mark as complete.")
+
+def on_entry_click(event):
+    """Changes the entry field color when it's clicked."""
+    task_entry.config(bg=WHITE, fg=BLACK)
+
+# Hover effect handlers
+def on_enter(event):
+    event.widget.config(bg=LIGHT_BLUE)
+
+def on_leave(event):
+    event.widget.config(bg=NAVY_BLUE)
+
+# -----------------
+# Tkinter Window Setup
+# -----------------
+root = tk.Tk()
+root.title("To-Do List")
+root.geometry("400x450")
+root.config(bg=LIGHT_GRAY)
+
+main_frame = tk.Frame(root, bg=LIGHT_GRAY)
+main_frame.pack(pady=20, padx=20, fill="both", expand=True)
+
+# -----------------
+# Entry + Add Button
+# -----------------
+task_entry = tk.Entry(main_frame, width=50, font=CASUAL_FONT, bg=BLACK, fg=WHITE)
+task_entry.pack(pady=10)
+task_entry.bind("<Button-1>", on_entry_click)
+
+add_button = tk.Button(
+    main_frame, text="Add Task", command=add_task,
+    font=CASUAL_FONT,
+    bg=NAVY_BLUE, fg=BLACK,
+    activebackground=NAVY_BLUE, activeforeground=BLACK,
+    borderwidth=0, relief="raised", padx=10, pady=5
+)
+add_button.pack(pady=5)
+add_button.bind("<Enter>", on_enter)
+add_button.bind("<Leave>", on_leave)
+
+# -----------------
+# Listbox + Scrollbar
+# -----------------
+list_frame = tk.Frame(main_frame, bg=BLACK, borderwidth=1, relief="sunken")
+list_frame.pack(pady=10, padx=10, fill="both", expand=True)
+
+scrollbar = tk.Scrollbar(list_frame)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+task_listbox = tk.Listbox(
+    list_frame, width=50, height=15, font=CASUAL_FONT,
+    borderwidth=0, relief="flat",
+    yscrollcommand=scrollbar.set,
+    bg=BLACK, fg=WHITE
+)
+task_listbox.pack(side=tk.LEFT, fill="both", expand=True)
+scrollbar.config(command=task_listbox.yview)
+
+# -----------------
+# Delete & Complete Buttons
+# -----------------
+button_frame = tk.Frame(main_frame, bg=LIGHT_GRAY)
+button_frame.pack(pady=10)
+
+delete_button = tk.Button(
+    button_frame, text="Delete Task", command=delete_task,
+    font=CASUAL_FONT,
+    bg=NAVY_BLUE, fg=BLACK,
+    activebackground=NAVY_BLUE, activeforeground=BLACK,
+    borderwidth=0, relief="raised", padx=10, pady=5
+)
+delete_button.pack(side=tk.LEFT, padx=5)
+delete_button.bind("<Enter>", on_enter)
+delete_button.bind("<Leave>", on_leave)
+
+complete_button = tk.Button(
+    button_frame, text="Mark Complete", command=mark_complete,
+    font=CASUAL_FONT,
+    bg=NAVY_BLUE, fg=BLACK,
+    activebackground=NAVY_BLUE, activeforeground=BLACK,
+    borderwidth=0, relief="raised", padx=10, pady=5
+)
+complete_button.pack(side=tk.LEFT, padx=5)
+complete_button.bind("<Enter>", on_enter)
+complete_button.bind("<Leave>", on_leave)
+
+# -----------------
+# Exit Button
+# -----------------
+exit_button = tk.Button(
+    main_frame, text="Exit", command=root.quit,
+    font=CASUAL_FONT,
+    bg=NAVY_BLUE, fg=BLACK,
+    activebackground=NAVY_BLUE, activeforeground=BLACK,
+    borderwidth=0, relief="raised", padx=10, pady=5
+)
+exit_button.pack(pady=20)
+exit_button.bind("<Enter>", on_enter)
+exit_button.bind("<Leave>", on_leave)
+
+# -----------------
+# Main Loop
+# -----------------
+root.mainloop()
